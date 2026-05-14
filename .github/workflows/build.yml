@@ -2,6 +2,11 @@ name: Build Flutter APK
 on:
   push:
     branches: [ "main" ]
+
+# Forzamos a GitHub a usar la versión nueva de Node.js para evitar la advertencia
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
