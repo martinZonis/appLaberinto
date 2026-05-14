@@ -329,15 +329,3 @@ class RenderizadorLaberinto extends CustomPainter {
     return true; 
   }
 }
-
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                if (namespace == null) {
-                    namespace project.group
-                }
-            }
-        }
-    }
-}
