@@ -1,7 +1,8 @@
 name: Build Flutter APK
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -9,25 +10,28 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: subosito/flutter-action@v2
+      - name: Checkout del código fuente
+        uses: actions/checkout@v4
+
+      - name: Instalar y configurar Flutter SDK
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
           channel: 'stable'
-          
-      - name: Descargar dependencias
+
+      - name: Descargar dependencias del proyecto (pub get)
         run: flutter pub get
 
-      - name: Parchear libreria Bluetooth (Inyeccion de Namespace)
+      - name: Parche de compatibilidad AGP (Inyección de Namespace)
         run: |
           sed -i 's/android {/android {\n    namespace "io.github.edufolly.flutterbluetoothserial"/g' /home/runner/.pub-cache/hosted/pub.dev/flutter_bluetooth_serial-0.4.0/android/build.gradle
 
-      - name: Compilar APK
+      - name: Compilar binario APK nativo
         run: flutter build apk --release
-        
-      - name: Subir artefacto final
+
+      - name: Publicar artefacto de descarga
         uses: actions/upload-artifact@v4
         with:
           name: app-release
