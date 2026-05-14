@@ -3,7 +3,6 @@ on:
   push:
     branches: [ "main" ]
 
-# Forzamos a GitHub a usar la versión nueva de Node.js para evitar la advertencia
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -12,13 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
           channel: 'stable'
-      - run: flutter pub get
-      - run: flutter build apk --release
-      - uses: actions/upload-artifact@v4
+          
+      - name: Descargar dependencias
+        run: flutter pub get
+
+      - name: Parchear libreria Bluetooth (Inyeccion de Namespace)
+        run: |
+          sed -i 's/android {/android {\n    namespace "io.github.edufolly.flutterbluetoothserial"/g' /home/runner/.pub-cache/hosted/pub.dev/flutter_bluetooth_serial-0.4.0/android/build.gradle
+
+      - name: Compilar APK
+        run: flutter build apk --release
+        
+      - name: Subir artefacto final
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: build/app/outputs/flutter-apk/app-release.apk
